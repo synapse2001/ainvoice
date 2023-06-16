@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 
 import InvoiceTable from './components/InvoiceTable';
+import StaticInvoiceTable from './components/StaticInvoiceTable';
 import PopupSearch from './components/PopupSearch';
 
 function App() {
@@ -9,7 +10,8 @@ function App() {
     <div className="app-container">
       <h1 className="app-heading">Invoices</h1>
       <div className="invoice-table-container">
-        <InvoiceTable />
+        {/* <InvoiceTable /> */}
+        <StaticInvoiceTable/>
       </div>
     </div>
   );
