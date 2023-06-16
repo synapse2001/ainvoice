@@ -36,3 +36,48 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* App container */
+.app-container {
+  text-align: center;
+  margin: 40px auto;
+}
+
+/* App heading */
+.app-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Invoice table container */
+.invoice-table-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #424242;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+  /* height: 5px; */
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b2b5b6;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+}
