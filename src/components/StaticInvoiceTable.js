@@ -71,13 +71,41 @@ class StaticInvoiceTable extends Component {
 
   handleSearch = (searchFields) => {
     const { invoices } = this.state;
-
+  
     const filteredInvoices = invoices.filter((invoice) => {
-      return Object.entries(searchFields).every(([field, value]) =>
-        String(invoice[field]).toLowerCase().includes(String(value).toLowerCase())
-      );
+      return Object.entries(searchFields).every(([field, value]) => {
+        const invoiceValue = invoice[field];
+  
+        if (field === 'slNo' && value !== '') {
+          return String(invoiceValue) === String(value);
+        } 
+        else if(field === 'uniqueCustId' && value !== ''){
+            return String(invoiceValue) === String(value);
+        }
+        else if (field === 'orderAmount' && value !== '') {
+          const searchAmount = parseFloat(value);
+          
+          return (
+            !isNaN(searchAmount) &&
+            invoiceValue >= searchAmount - 100 &&
+            invoiceValue <= searchAmount + 100
+          );
+        } 
+        else if(field === 'amountInUsd' && value !== ''){
+            const searchAmount = parseFloat(value);
+            return (
+              !isNaN(searchAmount) &&
+              invoiceValue >= searchAmount - 100 &&
+              invoiceValue <= searchAmount + 100
+            );
+        }
+        
+        else {
+          return String(invoiceValue).toLowerCase().includes(String(value).toLowerCase());
+        }
+      });
     });
-
+  
     this.setState({ filteredInvoices });
   };
 
