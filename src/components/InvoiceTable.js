@@ -58,7 +58,7 @@ class InvoiceTable extends Component {
   }
 
   componentDidMount() {
-    fetch('https://7jd2h.localto.net/invoice_management/DataLoadingServlet')
+    fetch('http://7jd2h.localto.net/invoice_management/DataLoadingServlet')
       .then((response) => response.json())
       .then((data) => this.setState({ invoices: data, isLoading: false, filteredInvoices: data }))
       .catch((error) => console.log('Error:', error));
