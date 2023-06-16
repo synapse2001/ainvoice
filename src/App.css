@@ -12,6 +12,20 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+body {
+  background-color: #000000; /* Set the background color to black */
+  animation: fade-in 2s; /* Add a fade-in animation with a duration of 2 seconds */
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0; /* Start with opacity 0 */
+  }
+  to {
+    opacity: 1; /* Fade in to opacity 1 */
+  }
+}
+
 
 .App-header {
   background-color: #282c34;
@@ -43,6 +57,7 @@
   text-align: center;
   margin: 40px auto;
 }
+
 
 /* App heading */
 .app-heading {

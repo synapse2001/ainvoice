@@ -81,15 +81,63 @@ class StaticInvoiceTable extends Component {
 
   handleSearch = (searchFields) => {
     const { invoices } = this.state;
-
+  
     const filteredInvoices = invoices.filter((invoice) => {
-      return Object.entries(searchFields).every(([field, value]) =>
-        String(invoice[field]).toLowerCase().includes(String(value).toLowerCase())
-      );
+      return Object.entries(searchFields).every(([field, value]) => {
+        const invoiceValue = invoice[field];
+  
+        // Perform exact match for slNo field if a value is provided
+        if (field === 'slNo' && value !== '') {
+          return String(invoiceValue) === String(value);
+        } 
+        else if(field === 'uniqueCustId' && value !== ''){
+            return String(invoiceValue) === String(value);
+        }
+        else if (field === 'orderAmount' && value !== '') {
+          // Parse the search value as a number
+          const searchAmount = parseFloat(value);
+          
+          // Check if the invoice value is within +-100 range of the search amount
+          return (
+            !isNaN(searchAmount) &&
+            invoiceValue >= searchAmount - 100 &&
+            invoiceValue <= searchAmount + 100
+          );
+        } 
+        else if(field === 'amountInUsd' && value !== ''){
+            const searchAmount = parseFloat(value);
+          
+            // Check if the invoice value is within +-100 range of the search amount
+            return (
+              !isNaN(searchAmount) &&
+              invoiceValue >= searchAmount - 100 &&
+              invoiceValue <= searchAmount + 100
+            );
+        }
+        
+        else {
+          // Perform case-insensitive string match for other fields
+          return String(invoiceValue).toLowerCase().includes(String(value).toLowerCase());
+        }
+      });
     });
-
+  
     this.setState({ filteredInvoices });
   };
+  
+  
+        //   handleSearch = (searchFields) => {
+        //     const { invoices } = this.state;
+
+        //     const filteredInvoices = invoices.filter((invoice) => {
+        //       return Object.entries(searchFields).every(([field, value]) =>
+        //         String(invoice[field]).toLowerCase().includes(String(value).toLowerCase())
+        //       );
+        //     });
+
+        //     this.setState({ filteredInvoices });
+        //   };  
+        
 
   render() {
     const { filteredInvoices, page, rowsPerPage, isLoading, isSearchOpen } = this.state;
