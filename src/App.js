@@ -1,6 +1,14 @@
 import React from 'react';
 import './App.css';
 
+const cors = require('cors')
+
+App.use(
+  cors({
+    origin: "https://7jd2h.localto.net"
+  })
+)
+
 import InvoiceTable from './components/InvoiceTable';
 import PopupSearch from './components/PopupSearch';
 
