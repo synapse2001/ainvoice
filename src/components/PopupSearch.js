@@ -91,7 +91,7 @@ class PopupSearch extends Component {
       return {
         selectedOptions,
         searchFields,
-        selectedOption: 'myfav', // Set the default option after each selection
+        selectedOption: 'myfav', 
       };
     });
   };
