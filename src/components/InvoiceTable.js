@@ -1,48 +1,39 @@
 import React, { Component } from 'react';
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
-  CircularProgress,
-} from '@mui/material';
-import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import TablePagination from '@mui/material/TablePagination';
-import { blue } from '@mui/material/colors';
-import PopupSearch from './PopupSearch';
+import { CircularProgress, IconButton, Paper, styled, ThemeProvider, createTheme } from '@mui/material';
+import { blue, grey } from '@mui/material/colors';
 import SearchIcon from '@mui/icons-material/Search';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import PopupSearch from './PopupSearch';
 
-const theme = createTheme();
-
-const StyledTableContainer = styled('div')({
-  width: '100%',
-  overflowX: 'auto',
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#ffffff',
+    },
+    text: {
+      primary: '#ffffff', // Set the text color to white
+    },
+    action: {
+      active: '#ffffff', // Set the active color to white
+    },
+    background: {
+      default: '#424242', // Set the background color to #424242
+      paper: '#424242', // Set the paper color to #424242
+    },
+    grey: {
+      800: '#424242', // Set the grey[800] color to #424242
+    },
+  },
 });
 
-const StyledTable = styled(Table)(({ theme }) => ({
-  minWidth: 650,
-  tableLayout: 'fixed',
-}));
+const StyledTableContainer = styled(Paper)({
+  width: '100%',
+  height: 'calc(100vh - 200px)',
+  backgroundColor: theme.palette.grey[800], // Set the background color to #424242
+});
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: 'bold',
-  backgroundColor: theme.palette.grey[800],
-  color: theme.palette.primary.contrastText,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-}));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.grey[900],
-  },
-  borderRadius: '4px',
-}));
+
 
 class InvoiceTable extends Component {
   constructor(props) {
@@ -64,7 +55,7 @@ class InvoiceTable extends Component {
       .catch((error) => console.log('Error:', error));
   }
 
-  handleChangePage = (event, newPage) => {
+  handleChangePage = (newPage) => {
     this.setState({ page: newPage });
   };
 
@@ -82,104 +73,100 @@ class InvoiceTable extends Component {
 
   handleSearch = (searchFields) => {
     const { invoices } = this.state;
-
+  
     const filteredInvoices = invoices.filter((invoice) => {
-      return Object.entries(searchFields).every(([field, value]) =>
-        String(invoice[field]).toLowerCase().includes(String(value).toLowerCase())
-      );
+      return Object.entries(searchFields).every(([field, value]) => {
+        const invoiceValue = invoice[field];
+  
+        if (field === 'slNo' && value !== '') {
+          return String(invoiceValue) === String(value);
+        } 
+        else if(field === 'uniqueCustId' && value !== ''){
+            return String(invoiceValue) === String(value);
+        }
+        else if (field === 'orderAmount' && value !== '') {
+          const searchAmount = parseFloat(value);
+          
+          return (
+            !isNaN(searchAmount) &&
+            invoiceValue >= searchAmount - 100 &&
+            invoiceValue <= searchAmount + 100
+          );
+        } 
+        else if(field === 'amountInUsd' && value !== ''){
+            const searchAmount = parseFloat(value);
+            return (
+              !isNaN(searchAmount) &&
+              invoiceValue >= searchAmount - 100 &&
+              invoiceValue <= searchAmount + 100
+            );
+        }
+        
+        else {
+          return String(invoiceValue).toLowerCase().includes(String(value).toLowerCase());
+        }
+      });
     });
-
+  
     this.setState({ filteredInvoices });
+  };
+
+  generateRowId = (row) => {
+    // Generate a unique id based on the row data
+    return `${row.slNo}-${row.customerOrderID}-${row.salesOrg}-${row.distributionChannel}`;
   };
 
   render() {
     const { filteredInvoices, page, rowsPerPage, isLoading, isSearchOpen } = this.state;
 
-    const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, filteredInvoices.length - page * rowsPerPage);
-
     return (
       <ThemeProvider theme={theme}>
         <StyledTableContainer>
           {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CircularProgress sx={{ color: 'white' }} />
             </div>
           ) : (
-            <StyledTable>
-              <TableHead>
-                <StyledTableRow>
-                  <StyledTableCell width="80px">Sl. No.</StyledTableCell>
-                  <StyledTableCell width="150px">Customer Order ID</StyledTableCell>
-                  <StyledTableCell width="100px">Sales Org</StyledTableCell>
-                  <StyledTableCell width="160px">Distribution Channel</StyledTableCell>
-                  <StyledTableCell width="100px">Division</StyledTableCell>
-                  <StyledTableCell width="160px">Released Credit Value</StyledTableCell>
-                  <StyledTableCell width="160px">Purchase Order Type</StyledTableCell>
-                  <StyledTableCell width="100px">Company Code</StyledTableCell>
-                  <StyledTableCell width="160px">Order Creation Date</StyledTableCell>
-                  <StyledTableCell width="160px">Order Creation Time</StyledTableCell>
-                  <StyledTableCell width="100px">Credit Control Area</StyledTableCell>
-                  <StyledTableCell width="160px">Sold To Party</StyledTableCell>
-                  <StyledTableCell width="160px">Order Amount</StyledTableCell>
-                  <StyledTableCell width="180px">Requested Delivery Date</StyledTableCell>
-                  <StyledTableCell width="120px">Order Currency</StyledTableCell>
-                  <StyledTableCell width="120px">Credit Status</StyledTableCell>
-                  <StyledTableCell width="120px">Customer Number</StyledTableCell>
-                  <StyledTableCell width="160px">Amount in USD</StyledTableCell>
-                  <StyledTableCell width="160px">Unique Cust ID</StyledTableCell>
-                </StyledTableRow>
-              </TableHead>
-              <TableBody>
-                {(rowsPerPage > 0
-                  ? filteredInvoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  : filteredInvoices
-                ).map((invoice, index) => (
-                  <StyledTableRow key={index}>
-                    <StyledTableCell>{invoice.slNo}</StyledTableCell>
-                    <StyledTableCell>{invoice.customerOrderID}</StyledTableCell>
-                    <StyledTableCell>{invoice.salesOrg}</StyledTableCell>
-                    <StyledTableCell>{invoice.distributionChannel}</StyledTableCell>
-                    <StyledTableCell>{invoice.division}</StyledTableCell>
-                    <StyledTableCell>{invoice.releasedCreditValue}</StyledTableCell>
-                    <StyledTableCell>{invoice.purchaseOrderType}</StyledTableCell>
-                    <StyledTableCell>{invoice.companyCode}</StyledTableCell>
-                    <StyledTableCell>{invoice.orderCreationDate}</StyledTableCell>
-                    <StyledTableCell>{invoice.orderCreationTime}</StyledTableCell>
-                    <StyledTableCell>{invoice.creditControlArea}</StyledTableCell>
-                    <StyledTableCell>{invoice.soldToParty}</StyledTableCell>
-                    <StyledTableCell>{invoice.orderAmount}</StyledTableCell>
-                    <StyledTableCell>{invoice.requestedDeliveryDate}</StyledTableCell>
-                    <StyledTableCell>{invoice.orderCurrency}</StyledTableCell>
-                    <StyledTableCell>{invoice.creditStatus}</StyledTableCell>
-                    <StyledTableCell>{invoice.customerNumber}</StyledTableCell>
-                    <StyledTableCell>{invoice.amountInUsd}</StyledTableCell>
-                    <StyledTableCell>{invoice.uniqueCustId}</StyledTableCell>
-                  </StyledTableRow>
-                ))}
-
-                {emptyRows > 0 && (
-                  <StyledTableRow style={{ height: 53 * emptyRows }}>
-                    <StyledTableCell colSpan={19} />
-                  </StyledTableRow>
-                )}
-              </TableBody>
-            </StyledTable>
+            <DataGrid
+              rows={filteredInvoices}
+              columns={[
+                { field: 'slNo', headerName: 'Sl. No.', width: 80 },
+                { field: 'customerOrderID', headerName: 'Customer Order ID', width: 150 },
+                { field: 'salesOrg', headerName: 'Sales Org', width: 100 },
+                { field: 'distributionChannel', headerName: 'Distribution Channel', width: 160 },
+                { field: 'division', headerName: 'Division', width: 100 },
+                { field: 'releasedCreditValue', headerName: 'Released Credit Value', width: 160 },
+                { field: 'purchaseOrderType', headerName: 'Purchase Order Type', width: 160 },
+                { field: 'companyCode', headerName: 'Company Code', width: 100 },
+                { field: 'orderCreationDate', headerName: 'Order Creation Date', width: 160 },
+                { field: 'orderCreationTime', headerName: 'Order Creation Time', width: 160 },
+                { field: 'creditControlArea', headerName: 'Credit Control Area', width: 100 },
+                { field: 'soldToParty', headerName: 'Sold To Party', width: 160 },
+                { field: 'orderAmount', headerName: 'Order Amount', width: 160 },
+                { field: 'requestedDeliveryDate', headerName: 'Requested Delivery Date', width: 180 },
+                { field: 'orderCurrency', headerName: 'Order Currency', width: 120 },
+                { field: 'creditStatus', headerName: 'Credit Status', width: 120 },
+                { field: 'customerNumber', headerName: 'Customer Number', width: 120 },
+                { field: 'amountInUsd', headerName: 'Amount in USD', width: 160 },
+                { field: 'uniqueCustId', headerName: 'Unique Cust ID', width: 160 },
+              ]}
+              pageSize={rowsPerPage}
+              pagination
+              page={page}
+              onPageChange={this.handleChangePage}
+              rowsPerPageOptions={[10, 25, 50, 100]}
+              rowCount={filteredInvoices.length}
+              onPageSizeChange={this.handleChangeRowsPerPage}
+              loading={isLoading}
+              getRowId={this.generateRowId}
+              components={{
+                Toolbar: GridToolbar,
+              }}
+              checkboxSelection // Show checkboxes
+              disableSelectionOnClick // Disable row selection on click
+            />
           )}
         </StyledTableContainer>
-        {!isLoading && (
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 50, 100]}
-            component="div"
-            count={filteredInvoices.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={this.handleChangePage}
-            onRowsPerPageChange={this.handleChangeRowsPerPage}
-            labelRowsPerPage="Rows per page"
-            style={{ color: 'white' }}
-          />
-        )}
         <IconButton
           color="primary"
           aria-label="search"
