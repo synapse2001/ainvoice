@@ -10,8 +10,8 @@ function App() {
     <div className="app-container">
       <h1 className="app-heading">Invoices</h1>
       <div className="invoice-table-container">
-        {/* <InvoiceTable /> */}
-        <StaticInvoiceTable/>
+        <InvoiceTable />
+        {/* <StaticInvoiceTable/> */}
       </div>
     </div>
   );
