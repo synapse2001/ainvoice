@@ -13,7 +13,7 @@
   }
 }
 body {
-  background-color: #000000; /* Set the background color to black */
+  background-color: #eeeeee; /* Set the background color to black */
   animation: fade-in 2s; /* Add a fade-in animation with a duration of 2 seconds */
 }
 
@@ -55,14 +55,55 @@ body {
 /* App container */
 .app-container {
   text-align: center;
-  margin: 40px auto;
+  top: 2px;
+  margin: 1px auto;
 }
 
 
 /* App heading */
 .app-heading {
   font-size: 24px;
+  /* margin-bottom: 20px; */
+  margin-left: 120px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  padding: 20px;
+  color:brown
+  /* background-color: #f2f2f2; */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  /* justify-content: flex-start; */
+}
+
+.hrc-logo {
+  width: 170px; /* Adjust the size as needed */
+  margin-left: 42vh; /* Move the hrclogo to the center */
+  /* justify-content: center; */
+}
+
+.abc-logo {
+  width: 50px; /* Adjust the size as needed */
+  margin-right: 10px; /* Adjust the spacing between logos */
+  /* justify-content: flex-start; */
+  width: 200px;
+}
+.footer {
+  /* background-color: #f2f2f2; */
+  margin-top: 20px;
   margin-bottom: 20px;
+  padding: 10px;
+  text-align: center;
+}
+
+.footer-text {
+  margin: 0;
 }
 
 /* Invoice table container */
@@ -95,4 +136,25 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
+}
+
+
+.adddataform{
+  color: aqua;
+}
+
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px rgb(94, 94, 94) inset !important;
 }

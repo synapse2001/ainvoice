@@ -1,181 +1,188 @@
 import React, { Component } from 'react';
-import { CircularProgress, IconButton, Paper, styled, ThemeProvider, createTheme } from '@mui/material';
+import { Box, Tab, Tabs, ThemeProvider, createTheme, IconButton, TextField, Button } from '@mui/material';
 import { blue, grey } from '@mui/material/colors';
+import Homepage from './HomePage';
+import AddDataForm from './AddDataForm';
+import AnalyticsView from './AnalyticsView';
+import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import PopupSearch from './PopupSearch';
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#ffffff',
-    },
+    primary: { main: '#ffffff' },
+    grey,
     text: {
-      primary: '#ffffff', // Set the text color to white
+      primary: '#ffffff',
     },
-    action: {
-      active: '#ffffff', // Set the active color to white
-    },
-    background: {
-      default: '#424242', // Set the background color to #424242
-      paper: '#424242', // Set the paper color to #424242
-    },
-    grey: {
-      800: '#424242', // Set the grey[800] color to #424242
+  },
+  typography: {
+    fontFamily: ['Arial', 'sans-serif'].join(','),
+    body1: {
+      background: 'none',
+      color: '#a4a6a5',
     },
   },
 });
 
-const StyledTableContainer = styled(Paper)({
-  width: '100%',
-  height: 'calc(100vh - 200px)',
-  backgroundColor: theme.palette.grey[800], // Set the background color to #424242
-});
-
-
-
-
 class InvoiceTable extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      invoices: [],
-      page: 0,
-      rowsPerPage: 10,
-      isLoading: true,
-      isSearchOpen: false,
-      filteredInvoices: [],
-    };
-  }
-
-  componentDidMount() {
-    fetch('https://ainvoice-backend.azurewebsites.net/DataLoadingServlet')
-      .then((response) => response.json())
-      .then((data) => this.setState({ invoices: data, isLoading: false, filteredInvoices: data }))
-      .catch((error) => console.log('Error:', error));
-  }
-
-  handleChangePage = (newPage) => {
-    this.setState({ page: newPage });
+  state = {
+    selectedTab: 0,
+    invoices: [],
+    isLoading: true,
+    searchField: '',
+    searchResults: [],
+    isSearchOpen: false,
   };
 
-  handleChangeRowsPerPage = (event) => {
-    this.setState({ rowsPerPage: +event.target.value, page: 0 });
+  componentDidMount() {
+    this.fetchInvoices();
+  }
+
+  fetchInvoices = async () => {
+    try {
+      // const response = await axios.get('http://localhost:8080/ainvoice_backend/DataLoadingServlet');
+      const response = await axios.get('https://ainvoice-backend.azurewebsites.net/DataLoadingServlet');
+      const data = response.data;
+      this.setState({ invoices: data, isLoading: false });
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
+
+  handleTabChange = (event, newValue) => {
+    this.setState({ selectedTab: newValue });
+  };
+
+  handleSearchFieldChange = (event) => {
+    this.setState({ searchField: event.target.value });
+  };
+
+  handleSearch = () => {
+    const { invoices, searchField } = this.state;
+    const searchResults = invoices.filter((invoice) => {
+      return parseInt(invoice.customerOrderID) === parseInt(searchField);
+    });
+    this.setState({ searchResults, selectedTab: 3 });
   };
 
   handleOpenSearch = () => {
-    this.setState({ isSearchOpen: true });
+    this.setState({ isSearchOpen: true })
   };
 
   handleCloseSearch = () => {
-    this.setState({ isSearchOpen: false });
+    this.setState({ isSearchOpen: false })
   };
 
-  handleSearch = (searchFields) => {
+  handleAdvsearch = (searchFields) => {
     const { invoices } = this.state;
-  
     const filteredInvoices = invoices.filter((invoice) => {
       return Object.entries(searchFields).every(([field, value]) => {
         const invoiceValue = invoice[field];
-  
+
         if (field === 'slNo' && value !== '') {
           return String(invoiceValue) === String(value);
-        } 
-        else if(field === 'uniqueCustId' && value !== ''){
-            return String(invoiceValue) === String(value);
-        }
-        else if (field === 'orderAmount' && value !== '') {
+        } else if (field === 'uniqueCustId' && value !== '') {
+          return String(invoiceValue) === String(value);
+        } else if (field === 'orderAmount' && value !== '') {
           const searchAmount = parseFloat(value);
-          
+
           return (
             !isNaN(searchAmount) &&
             invoiceValue >= searchAmount - 100 &&
             invoiceValue <= searchAmount + 100
           );
-        } 
-        else if(field === 'amountInUsd' && value !== ''){
-            const searchAmount = parseFloat(value);
-            return (
-              !isNaN(searchAmount) &&
-              invoiceValue >= searchAmount - 100 &&
-              invoiceValue <= searchAmount + 100
-            );
-        }
-        
-        else {
+        } else if (field === 'amountInUsd' && value !== '') {
+          const searchAmount = parseFloat(value);
+          return (
+            !isNaN(searchAmount) &&
+            invoiceValue >= searchAmount - 100 &&
+            invoiceValue <= searchAmount + 100
+          );
+        } else {
           return String(invoiceValue).toLowerCase().includes(String(value).toLowerCase());
         }
       });
     });
-  
-    this.setState({ filteredInvoices });
-  };
 
-  generateRowId = (row) => {
-    // Generate a unique id based on the row data
-    return `${row.slNo}-${row.customerOrderID}-${row.salesOrg}-${row.distributionChannel}`;
+    this.setState({ searchResults: filteredInvoices, selectedTab: 3 })
   };
 
   render() {
-    const { filteredInvoices, page, rowsPerPage, isLoading, isSearchOpen } = this.state;
+    const { selectedTab, invoices, isLoading, searchField, searchResults, isSearchOpen } = this.state;
 
     return (
       <ThemeProvider theme={theme}>
-        <StyledTableContainer>
-          {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <CircularProgress sx={{ color: 'white' }} />
-            </div>
-          ) : (
-            <DataGrid
-              rows={filteredInvoices}
-              columns={[
-                { field: 'slNo', headerName: 'Sl. No.', width: 80 },
-                { field: 'customerOrderID', headerName: 'Customer Order ID', width: 150 },
-                { field: 'salesOrg', headerName: 'Sales Org', width: 100 },
-                { field: 'distributionChannel', headerName: 'Distribution Channel', width: 160 },
-                { field: 'division', headerName: 'Division', width: 100 },
-                { field: 'releasedCreditValue', headerName: 'Released Credit Value', width: 160 },
-                { field: 'purchaseOrderType', headerName: 'Purchase Order Type', width: 160 },
-                { field: 'companyCode', headerName: 'Company Code', width: 100 },
-                { field: 'orderCreationDate', headerName: 'Order Creation Date', width: 160 },
-                { field: 'orderCreationTime', headerName: 'Order Creation Time', width: 160 },
-                { field: 'creditControlArea', headerName: 'Credit Control Area', width: 100 },
-                { field: 'soldToParty', headerName: 'Sold To Party', width: 160 },
-                { field: 'orderAmount', headerName: 'Order Amount', width: 160 },
-                { field: 'requestedDeliveryDate', headerName: 'Requested Delivery Date', width: 180 },
-                { field: 'orderCurrency', headerName: 'Order Currency', width: 120 },
-                { field: 'creditStatus', headerName: 'Credit Status', width: 120 },
-                { field: 'customerNumber', headerName: 'Customer Number', width: 120 },
-                { field: 'amountInUsd', headerName: 'Amount in USD', width: 160 },
-                { field: 'uniqueCustId', headerName: 'Unique Cust ID', width: 160 },
-              ]}
-              pageSize={rowsPerPage}
-              pagination
-              page={page}
-              onPageChange={this.handleChangePage}
-              rowsPerPageOptions={[10, 25, 50, 100]}
-              rowCount={filteredInvoices.length}
-              onPageSizeChange={this.handleChangeRowsPerPage}
-              loading={isLoading}
-              getRowId={this.generateRowId}
-              components={{
-                Toolbar: GridToolbar,
-              }}
-              checkboxSelection // Show checkboxes
-              disableSelectionOnClick // Disable row selection on click
-            />
-          )}
-        </StyledTableContainer>
-        <IconButton
-          color="primary"
-          aria-label="search"
-          onClick={this.handleOpenSearch}
-          style={{ position: 'absolute', top: 10, right: 10 }}
+        <Box
+          sx={{
+            width: '100%',
+            backgroundColor: grey[800],
+            // minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '20px',
+          }}
         >
-          <SearchIcon />
-        </IconButton>
-        <PopupSearch isOpen={isSearchOpen} onClose={this.handleCloseSearch} onSearch={this.handleSearch} />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TextField
+                id="searchField"
+                label="Search by Customer ID"
+                variant="outlined"
+                value={searchField}
+                onChange={this.handleSearchFieldChange}
+                sx={{
+                  mr: 1,
+                  color: '#ffffff',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
+                  },
+                }}
+              />
+              <IconButton color="primary" aria-label="search" onClick={this.handleSearch}>
+                <SearchIcon />
+              </IconButton>
+            </Box>
+
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={this.handleOpenSearch}
+              style={{ height: '50px' }}
+            >
+              Advanced Search
+            </Button>
+          </Box>
+
+          <Tabs
+            value={selectedTab}
+            onChange={this.handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+            centered
+          >
+            <Tab label="Homepage" sx={{ color: '#d6d6d6' }} />
+            <Tab label="Add Data" sx={{ color: '#d6d6d6' }} />
+            <Tab label="Analytics View" sx={{ color: '#d6d6d6' }} />
+            <Tab label="Search Result" sx={{ color: '#d6d6d6' }} />
+          </Tabs>
+
+          <Box sx={{ p: 2, flex: 1 }}>
+            {selectedTab === 0 && <Homepage invoices={invoices} isLoading={isLoading} onRefresh={this.fetchInvoices} />}
+            {selectedTab === 1 && <AddDataForm />}
+            {selectedTab === 2 && <AnalyticsView invoices={invoices} />}
+            {selectedTab === 3 && <Homepage invoices={searchResults} isLoading={isLoading} onRefresh={this.fetchInvoices}/>}
+          </Box>
+
+          <PopupSearch isOpen={isSearchOpen} onClose={this.handleCloseSearch} onSearch={this.handleAdvsearch} />
+        </Box>
       </ThemeProvider>
     );
   }

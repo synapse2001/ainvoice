@@ -11,17 +11,17 @@ const theme = createTheme({
       main: '#ffffff',
     },
     text: {
-      primary: '#ffffff', // Set the text color to white
+      primary: '#ffffff',
     },
     action: {
-      active: '#ffffff', // Set the active color to white
+      active: '#ffffff',
     },
     background: {
-      default: '#424242', // Set the background color to #424242
-      paper: '#424242', // Set the paper color to #424242
+      default: '#424242',
+      paper: '#424242',
     },
     grey: {
-      800: '#424242', // Set the grey[800] color to #424242
+      800: '#424242',
     },
   },
 });
@@ -29,7 +29,7 @@ const theme = createTheme({
 const StyledTableContainer = styled(Paper)({
   width: '100%',
   height: 'calc(100vh - 200px)',
-  backgroundColor: theme.palette.grey[800], // Set the background color to #424242
+  backgroundColor: theme.palette.grey[800],
 });
 
 
@@ -71,46 +71,45 @@ class StaticInvoiceTable extends Component {
 
   handleSearch = (searchFields) => {
     const { invoices } = this.state;
-  
+
     const filteredInvoices = invoices.filter((invoice) => {
       return Object.entries(searchFields).every(([field, value]) => {
         const invoiceValue = invoice[field];
-  
+
         if (field === 'slNo' && value !== '') {
           return String(invoiceValue) === String(value);
-        } 
-        else if(field === 'uniqueCustId' && value !== ''){
-            return String(invoiceValue) === String(value);
+        }
+        else if (field === 'uniqueCustId' && value !== '') {
+          return String(invoiceValue) === String(value);
         }
         else if (field === 'orderAmount' && value !== '') {
           const searchAmount = parseFloat(value);
-          
+
           return (
             !isNaN(searchAmount) &&
             invoiceValue >= searchAmount - 100 &&
             invoiceValue <= searchAmount + 100
           );
-        } 
-        else if(field === 'amountInUsd' && value !== ''){
-            const searchAmount = parseFloat(value);
-            return (
-              !isNaN(searchAmount) &&
-              invoiceValue >= searchAmount - 100 &&
-              invoiceValue <= searchAmount + 100
-            );
         }
-        
+        else if (field === 'amountInUsd' && value !== '') {
+          const searchAmount = parseFloat(value);
+          return (
+            !isNaN(searchAmount) &&
+            invoiceValue >= searchAmount - 100 &&
+            invoiceValue <= searchAmount + 100
+          );
+        }
+
         else {
           return String(invoiceValue).toLowerCase().includes(String(value).toLowerCase());
         }
       });
     });
-  
+
     this.setState({ filteredInvoices });
   };
 
   generateRowId = (row) => {
-    // Generate a unique id based on the row data
     return `${row.slNo}-${row.customerOrderID}-${row.salesOrg}-${row.distributionChannel}`;
   };
 
@@ -160,8 +159,8 @@ class StaticInvoiceTable extends Component {
               components={{
                 Toolbar: GridToolbar,
               }}
-              checkboxSelection // Show checkboxes
-              disableSelectionOnClick // Disable row selection on click
+              checkboxSelection
+              disableSelectionOnClick
             />
           )}
         </StyledTableContainer>

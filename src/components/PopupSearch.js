@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 
+
 const StyledDialog = styled(Dialog)`
   display: flex;
   justify-content: center;
@@ -22,8 +23,11 @@ const StyledDialog = styled(Dialog)`
   & .MuiPaper-root {
     border-radius: 16px;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+    background-color: grey;
   }
 `;
+
+
 
 const CardContainer = styled(DialogContent)`
   display: flex;
@@ -64,7 +68,7 @@ class PopupSearch extends Component {
         uniqueCustId: '',
       },
       selectedOptions: [],
-      selectedOption: 'myfav', // Default option
+      selectedOption: 'myfav',
     };
   }
 
@@ -91,7 +95,7 @@ class PopupSearch extends Component {
       return {
         selectedOptions,
         searchFields,
-        selectedOption: 'myfav', 
+        selectedOption: 'myfav',
       };
     });
   };
@@ -116,7 +120,7 @@ class PopupSearch extends Component {
               You can choose Multiple Option !
             </MenuItem>
             {Object.keys(searchFields).map((option) => (
-              <MenuItem key={option} value={option} disabled={selectedOptions.includes(option)}>
+              <MenuItem key={option} value={option} disabled={selectedOptions.includes(option)} sx={{ color: 'black' }}>
                 {option}
               </MenuItem>
             ))}
