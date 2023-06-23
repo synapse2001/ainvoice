@@ -105,6 +105,22 @@ body {
 .footer-text {
   margin: 0;
 }
+@media (max-width: 900px) {
+  .logo-container {
+    justify-content: center;
+    flex-direction: column; /* Center the logos */
+  }
+
+  .hrc-logo {
+    margin-left: 0; /* Reset the left margin */
+    margin-bottom: 10px; /* Shift the hrc-logo downwards */
+  }
+  .app-heading {
+    font-size: 24px;
+    /* margin-bottom: 20px; */
+    margin-left: 0px;
+  }
+}
 
 /* Invoice table container */
 .invoice-table-container {

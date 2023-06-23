@@ -197,7 +197,8 @@ const Homepage = ({ invoices, isLoading, onRefresh }) => {
           <Button
             variant="contained"
             color="error"
-            disabled={selectedInvoiceIds.length === 0 || isLoading}
+            // disabled={selectedInvoiceIds.length === 0 || isLoading}
+            disabled
             onClick={
               handleDeleteButtonClick
             }
@@ -211,6 +212,7 @@ const Homepage = ({ invoices, isLoading, onRefresh }) => {
             color="button_color"
             disabled={isLoading || selectedInvoiceIds.length === 0 || ispredicting}
             onClick={handlePredictSelected}
+            style={{ margin: '1rem' }}
           >
             {ispredicting ? "Predicting" : "Predict"}
           </Button>
